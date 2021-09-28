@@ -23,13 +23,11 @@ def create_users(**data):
         'u1_first_name': 'user1firstname',
         'u1_last_name': 'user1lastname',
         'u1_password': 'user1password',
-        'u1_password': 'user1password',
 
         'u2_username': 'user2username',
         'u2_email': 'user2email@test.com',
         'u2_first_name': 'user2firstname',
         'u2_last_name': 'user2lastname',
-        'u2_password': 'user2password',
         'u2_password': 'user2password',
 
         'u3_username': 'user3username',
@@ -50,13 +48,16 @@ def create_users(**data):
     user_1 = User.objects.create_user(**user_1_data)
     user_1.set_password(default_data['u1_password'])
     Profile.objects.create(user=user_1)
+    user_1.save()
     
     user_2 = User.objects.create_user(**user_2_data)
     user_2.set_password(default_data['u2_password'])
     Profile.objects.create(user=user_2)
+    user_2.save()
 
     user_3 = User.objects.create_user(**user_3_data)
     user_3.set_password(default_data['u3_password'])
     Profile.objects.create(user=user_3)
+    user_3.save()
 
-    return user_1, user_2, user_3
+    return (user_1, user_2, user_3), { k: v for k, v in default_data.items() if k.endswith('password') }

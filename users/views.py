@@ -1,7 +1,7 @@
 """User views."""
 
 # REST Framework
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -10,7 +10,6 @@ from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
 )
-# from users.permissions import IsAccountOwner
 
 # Serializers
 from users.serializers import (
@@ -23,13 +22,14 @@ from users.serializers import (
 from users.models import User
 
 
-class UserViewSet(mixins.CreateModelMixin,
-                  viewsets.GenericViewSet):
+class UserViewSet(viewsets.GenericViewSet):
     """User view set.
     
     Handles sign up, login, account verification
     and profile update.
     """
+
+    lookup_url_kwarg = 'pk'
 
     def get_permissions(self):
         """Assign permissions based on action."""
@@ -48,23 +48,23 @@ class UserViewSet(mixins.CreateModelMixin,
         data = UserModelSerializer(user).data
         return Response(data, status.HTTP_201_CREATED)
 
-    @action(detail=False, methods=['POST', 'DELETE'])
-    def follow(self, request):
+    @action(detail=True, methods=['POST', 'DELETE'])
+    def follow(self, request, *args, **kwargs):
         """Establishes or removes a relationship
         between this user and the given user.
         """
         serializer = FollowSerializer(
-            data=request.query_params, 
+            data=kwargs, 
             context={
                 'request':request,
                 'method': self.request.method,
         })
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        followed_user = serializer.save()
         data = {
-            'current_user': self.request.user.email,
-            'followed_user': request.query_params['user_email'],
+            'current_user': self.request.user.pk,
+            'followed_user': followed_user.pk,
         }
         if self.request.method == 'DELETE':
-            return Response(status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(data, status.HTTP_201_CREATED)

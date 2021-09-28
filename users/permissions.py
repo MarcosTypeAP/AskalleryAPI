@@ -3,7 +3,7 @@
 # REST Framework
 from rest_framework import permissions
 
-
+# Not used
 class IsAccountOwner(permissions.BasePermission):
     """Verify if the user is owner of the account."""
 

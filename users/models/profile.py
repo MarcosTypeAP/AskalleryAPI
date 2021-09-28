@@ -41,7 +41,7 @@ class Profile(AskalleryModel, models.Model):
     following = models.ManyToManyField('users.User', related_name='following')
 
     followers_quantity = models.IntegerField(
-        'followers',
+        'quantity of followers',
         default=0,
         help_text=(
             'Quantity of followers of this user.'
@@ -51,7 +51,7 @@ class Profile(AskalleryModel, models.Model):
     )
 
     following_quantity = models.IntegerField(
-        'following',
+        'quantity of following',
         default=0,
         help_text=(
             'Quantity of users that this user is following.',

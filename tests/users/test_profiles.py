@@ -3,9 +3,6 @@
 # Django
 from django.test import TestCase
 
-# Models
-from users.models import Profile, User
-
 # Utils
 from utils.tests import create_users
 
@@ -15,7 +12,7 @@ class UserProfileModelTestCase(TestCase):
 
     def setUp(self):
         """Create new users for testing."""
-        self.users = create_users()
+        self.users, _ = create_users()
 
     def test_profile_follow_methods(self):
         """Test 'start_follow' and

@@ -35,7 +35,7 @@ class FollowSerializer(serializers.Serializer):
     and the request user.
     """
 
-    user_email = serializers.EmailField()
+    pk = serializers.IntegerField()
 
     request_user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
@@ -44,9 +44,9 @@ class FollowSerializer(serializers.Serializer):
         and it's not the request user.
         """
         try:
-            followed_user = User.objects.get(email=data['user_email'])
+            followed_user = User.objects.get(pk=data['pk'])
         except User.DoesNotExist:
-            raise serializers.ValidationError("Invalid user email.")
+            raise serializers.ValidationError("Invalid user.")
 
         if followed_user == data['request_user']:
             raise serializers.ValidationError("An user cannot follow itself.")
