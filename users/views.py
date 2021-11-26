@@ -29,8 +29,6 @@ class UserViewSet(viewsets.GenericViewSet):
     and profile update.
     """
 
-    lookup_url_kwarg = 'pk'
-
     def get_permissions(self):
         """Assign permissions based on action."""
         if self.action in ['signup']:
@@ -50,21 +48,21 @@ class UserViewSet(viewsets.GenericViewSet):
 
     @action(detail=True, methods=['POST', 'DELETE'])
     def follow(self, request, *args, **kwargs):
-        """Establishes or removes a relationship
-        between this user and the given user.
+        """Establishes or removes a follow relationship
+        between the request user and the given user.
         """
         serializer = FollowSerializer(
-            data=kwargs, 
-            context={
-                'request':request,
-                'method': self.request.method,
-        })
+            data=kwargs, context={
+                'request': request,
+                'method': request.method
+            }
+        )
         serializer.is_valid(raise_exception=True)
         followed_user = serializer.save()
         data = {
-            'current_user': self.request.user.pk,
+            'current_user': request.user.pk,
             'followed_user': followed_user.pk,
         }
-        if self.request.method == 'DELETE':
+        if request.method == 'DELETE':
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(data, status.HTTP_201_CREATED)

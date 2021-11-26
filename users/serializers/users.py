@@ -31,6 +31,22 @@ class UserModelSerializer(serializers.ModelSerializer):
         )
 
 
+class MinimumUserFieldsModelSerializer(serializers.ModelSerializer):
+    """Returns the minimum fields for be displayed in a front-end."""
+
+    picture = serializers.SerializerMethodField()
+
+    class Meta:
+        """Meta options."""
+        model = User
+        fields = ('pk', 'username', 'picture')
+
+    def get_picture(self, instance):
+        """Returns user's profile picture."""
+        if instance.profile.picture:
+            return instance.profile.picture
+        return None
+
 class UserSignUpSerializer(serializers.Serializer):
     """User sign up serializer."""
 

@@ -19,7 +19,7 @@ class UserProfileModelTestCase(TestCase):
         'stop_following' methods.
         """
         user_1, user_2, user_3 = self.users
-        
+
         user_1.profile.start_follow(user_2)
         user_1.profile.start_follow(user_3)
 

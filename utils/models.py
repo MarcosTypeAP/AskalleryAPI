@@ -6,7 +6,7 @@ from django.db import models
 
 class AskalleryModel(models.Model):
     """Askallery base model.
-    
+
     AskalleryModel acts as an abstract base class which
     will be inherited by all other models in the project.
     This class provides every table with some Meta class settings

@@ -13,14 +13,14 @@ from utils.models import AskalleryModel
 
 class Comment(AskalleryModel, models.Model):
     """Comment model.
-    
+
     It's text which will be related between 
     a post and an user.
     """
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    
-    post = models.ForeignKey(Post, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
 
     content = models.TextField(
         'content',

@@ -11,7 +11,6 @@ from users.models import Profile, User
 
 class ProfileModelSerializer(serializers.ModelSerializer):
     """Profile model serializer."""
-
     class Meta:
         """Meta options."""
         model = Profile
@@ -37,10 +36,12 @@ class FollowSerializer(serializers.Serializer):
 
     pk = serializers.IntegerField()
 
-    request_user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    request_user = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
+    )
 
     def validate(self, data):
-        """Verify the followed user exists 
+        """Verify the followed user exists
         and it's not the request user.
         """
         try:
@@ -50,7 +51,7 @@ class FollowSerializer(serializers.Serializer):
 
         if followed_user == data['request_user']:
             raise serializers.ValidationError("An user cannot follow itself.")
-        
+
         self.context['followed_user'] = followed_user
 
         return data
@@ -66,5 +67,5 @@ class FollowSerializer(serializers.Serializer):
             request_user.profile.start_follow(followed_user)
         else:
             request_user.profile.stop_following(followed_user)
-        
+
         return followed_user

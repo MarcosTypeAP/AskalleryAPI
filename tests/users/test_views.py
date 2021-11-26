@@ -16,7 +16,6 @@ from utils.tests import create_users
 
 class UserViewsTestCase(APITestCase):
     """User views test case."""
-
     def setUp(self):
         self.signup_url = reverse_lazy('users:users-signup')
         self.token_pair_url = reverse_lazy('users:token_obtain_pair')
@@ -46,7 +45,10 @@ class UserViewsTestCase(APITestCase):
 
         self.assertEqual(profile, user.profile)
 
-        is_logged_in = self.client.login(email=self.signup_data['email'], password=self.signup_data['password'])
+        is_logged_in = self.client.login(
+            email=self.signup_data['email'],
+            password=self.signup_data['password']
+        )
 
         self.assertTrue(is_logged_in)
 
@@ -56,23 +58,30 @@ class UserViewsTestCase(APITestCase):
         """
         user_1, user_2, _ = self.users
 
-        response = self.client.post(self.token_pair_url, data={
-            'email': user_1.email, 
-            'password': self.user_passwords['u1_password']
-        })
+        response = self.client.post(
+            self.token_pair_url,
+            data={
+                'email': user_1.email,
+                'password': self.user_passwords['u1_password']
+            }
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn('access', response.data)
         self.assertIn('refresh', response.data)
 
-        response = self.client.post(self.token_refresh_url, data={'refresh': response.data['refresh']})
+        response = self.client.post(
+            self.token_refresh_url, data={'refresh': response.data['refresh']}
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn('access', response.data)
         self.assertNotIn('refresh', response.data)
 
         client = APIClient()
-        client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data['access'])
+        client.credentials(
+            HTTP_AUTHORIZATION='Bearer ' + response.data['access']
+        )
 
         follow_url = reverse_lazy('users:users-follow', args=[user_2.pk])
         response = client.post(follow_url)

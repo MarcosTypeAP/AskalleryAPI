@@ -1,11 +1,17 @@
 """Test utilities."""
 
 # Models
-from users.models import User, Profile 
+from users.models import User, Profile
+
+# Utils
+from PIL import Image
+import tempfile
 
 
 def create_users(**data):
     """Creates 3 users for testing.
+
+    Returns 3 'User' tuple and a dict with the users's password.
 
     Parameters passed will overwrite default_data.
 
@@ -41,15 +47,27 @@ def create_users(**data):
         if new_data_key in default_data:
             default_data[new_data_key] = new_data_value
 
-    user_1_data = { k[3:]: v for k, v in default_data.items() if k.startswith('u1') and 'password' != k[3:] }
-    user_2_data = { k[3:]: v for k, v in default_data.items() if k.startswith('u2') and 'password' != k[3:] }
-    user_3_data = { k[3:]: v for k, v in default_data.items() if k.startswith('u3') and 'password' != k[3:] }
+    user_1_data = {
+        k[3:]: v
+        for k, v in default_data.items()
+        if k.startswith('u1') and 'password' != k[3:]
+    }
+    user_2_data = {
+        k[3:]: v
+        for k, v in default_data.items()
+        if k.startswith('u2') and 'password' != k[3:]
+    }
+    user_3_data = {
+        k[3:]: v
+        for k, v in default_data.items()
+        if k.startswith('u3') and 'password' != k[3:]
+    }
 
     user_1 = User.objects.create_user(**user_1_data)
     user_1.set_password(default_data['u1_password'])
     Profile.objects.create(user=user_1)
     user_1.save()
-    
+
     user_2 = User.objects.create_user(**user_2_data)
     user_2.set_password(default_data['u2_password'])
     Profile.objects.create(user=user_2)
@@ -60,4 +78,33 @@ def create_users(**data):
     Profile.objects.create(user=user_3)
     user_3.save()
 
-    return (user_1, user_2, user_3), { k: v for k, v in default_data.items() if k.endswith('password') }
+    return (user_1, user_2, user_3), {
+        k: v
+        for k, v in default_data.items() if k.endswith('password')
+    }
+
+
+def create_image():
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
+        image = Image.new('RGB', (200, 200), 'white')
+        image.save(f, 'PNG')
+
+    return open(f.name, mode='rb')
+
+
+def create_data_list(k):
+    """Returns a list of data, which can be used
+    for post creation.
+
+    data: (dict) -> {
+        caption: (str) -> Caption for the post
+        image: (tmp image) -> Image for the post
+    }
+    """
+    data_list = [
+        {
+            'caption': 'Caption for testing {}.'.format(n),
+            'image': create_image(),
+        } for n in range(1, k + 1)
+    ]
+    return data_list
