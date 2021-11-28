@@ -170,13 +170,18 @@ class PostViewsAPITestCase(APITestCase):
         c1 = APIClient()
         c2 = APIClient()
         post = Post.objects.create(user=user_1)
-        data = {'content': 'Test comment content', 'post_pk': post.pk}
-        comment_post_url = reverse_lazy('posts:posts-comment')
+        comment_post_url = reverse_lazy('posts:comments-list')
         response = c1.post(comment_post_url)
 
         self.assertEqual(response.status_code, 401)
 
         c1.force_authenticate(user=user_1)
+        data = {'content': 'Test comment content', 'post': 99}
+        response = c1.post(comment_post_url, data=data, format='json')
+
+        self.assertEqual(response.status_code, 404)
+
+        data['post'] = post.pk
         response = c1.post(comment_post_url, data=data, format='json')
 
         self.assertEqual(response.status_code, 201)
@@ -192,11 +197,8 @@ class PostViewsAPITestCase(APITestCase):
 
         comment_c1 = Comment.objects.get(user=user_1)
         uncomment_post_url = reverse_lazy(
-            'posts:posts-comment',
-            kwargs={
-                'comment_pk': comment_c1.pk,
-                'post_pk': post.pk
-            }
+            'posts:comments-detail',
+            args=(comment_c1.pk, )
         )
         response = c2.delete(uncomment_post_url)
 
@@ -210,11 +212,8 @@ class PostViewsAPITestCase(APITestCase):
 
         comment_c2 = Comment.objects.get(user=user_2)
         uncomment_post_url = reverse_lazy(
-            'posts:posts-comment',
-            kwargs={
-                'comment_pk': comment_c2.pk,
-                'post_pk': post.pk
-            }
+            'posts:comments-detail',
+            args=(comment_c2.pk, )
         )
         response = c1.delete(uncomment_post_url)
 

@@ -81,9 +81,10 @@ class Post(AskalleryModel, models.Model):
         """Creates a 'Comment' instance with passed user and content,
         and establishes a relationship between the comment and this post.
         """
-        self.comment_set.create(user=user, content=content)
+        comment = self.comment_set.create(user=user, content=content)
         self.comments_quantity += 1
         self.save()
+        return comment
 
     def remove_comment(self, comment):
         self.comment_set.filter(pk=comment).delete()

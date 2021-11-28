@@ -11,7 +11,10 @@ from rest_framework.reverse import reverse_lazy
 from users.models import User, Profile
 
 # Utils
-from utils.tests import create_users
+from utils.tests import (
+    create_users,
+    create_image,
+)
 
 
 class UserViewsTestCase(APITestCase):
@@ -30,7 +33,7 @@ class UserViewsTestCase(APITestCase):
         }
         self.users, self.user_passwords = create_users()
 
-    def test_signup_action(self):
+    def test_signup(self):
         """Test the creation of a new user."""
         response = self.client.post(self.signup_url, self.signup_data)
 
@@ -88,7 +91,7 @@ class UserViewsTestCase(APITestCase):
 
         self.assertEqual(response.status_code, 201)
 
-    def test_follow_action(self):
+    def test_follow(self):
         """Test if be created a follow relationship
         between two users.
         """
@@ -115,3 +118,24 @@ class UserViewsTestCase(APITestCase):
 
         self.assertEqual(client_user.profile.following.count(), 0)
         self.assertEqual(user_2.profile.followers.count(), 0)
+
+    def test_update_profile(self):
+        """Verifies that a profile can be updated."""
+        user_1, _, _ = self.users
+        partial_update_data = {'biography': 'test biography 1'}
+        c1 = APIClient()
+        update_profile_url = reverse_lazy(
+            'users:users-profile'
+        )
+        response = c1.patch(update_profile_url)
+
+        self.assertEqual(response.status_code, 401)
+
+        c1.force_authenticate(user=user_1)
+        response = c1.patch(update_profile_url, data=partial_update_data)
+
+        self.assertEqual(response.status_code, 201)
+
+        profile = Profile.objects.get(user=user_1, pk=1)
+
+        self.assertEqual(profile.biography, partial_update_data['biography'])

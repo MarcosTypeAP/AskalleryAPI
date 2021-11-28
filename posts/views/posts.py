@@ -11,15 +11,12 @@ from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated,
 )
-from posts.permissions import IsCommentOrPostOwner
 
 # Serializers
 from posts.serializers import (
     PostCreationModelSerializer,
     PostModelSerializer,
     LikeSerializer,
-    CreateCommentSerializer,
-    DeleteCommentSerializer,
 )
 
 # Models
@@ -43,8 +40,6 @@ class PostViewSet(
         permissions = [IsAuthenticated]
         if self.action in ("retrieve", "list"):
             permissions = [AllowAny]
-        elif self.action == 'comment':
-            permissions.append(IsCommentOrPostOwner)
         return [p() for p in permissions]
 
     def get_serializer_class(self):
@@ -55,16 +50,6 @@ class PostViewSet(
             return PostModelSerializer
         elif self.action == 'like':
             return LikeSerializer
-
-    def get_object(self, *args, **kwargs):
-        """Returns a ´Comment´ instance by using
-        ´pk´ based on action and method.
-        """
-        if self.action == 'comment' and self.request.method == 'DELETE':
-            obj = get_object_or_404(Comment, pk=kwargs['comment_pk'])
-            self.check_object_permissions(self.request, obj)
-            return obj
-        return super(PostViewSet, self).get_object(*args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         get_object_or_404(User, pk=kwargs.get("pk"))
@@ -94,22 +79,3 @@ class PostViewSet(
             return Response(status=status.HTTP_204_NO_CONTENT)
         data = {'liked_post': liked_post.pk}
         return Response(data, status.HTTP_201_CREATED)
-
-    @action(detail=False, methods=['POST', 'DELETE'])
-    def comment(self, request, *args, **kwargs):
-        if request.method == "POST":
-            serializer = CreateCommentSerializer(
-                data=request.data, context={'request': request}
-            )
-        else:
-            self.get_object(**kwargs)
-            serializer = DeleteCommentSerializer(data=kwargs)
-        serializer.is_valid(raise_exception=True)
-        commented_post = serializer.save()
-        if request.method == 'DELETE':
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        data = {
-            'commented_post': commented_post.pk,
-            'comment_content': serializer.data['content']
-        }
-        return Response(data, status=status.HTTP_201_CREATED)

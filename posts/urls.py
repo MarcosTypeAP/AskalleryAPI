@@ -7,22 +7,26 @@ from django.urls import include, path, re_path
 from rest_framework import routers
 
 # Views
-from posts import views as post_views
+from posts.views import (
+    PostViewSet,
+    CommentViewSet
+)
 
 
 router = routers.SimpleRouter()
-router.register("posts", post_views.PostViewSet, basename="posts")
+router.register("posts", PostViewSet, basename="posts")
+router.register("comments", CommentViewSet, basename="comments")
 
 urlpatterns = [
 
     path("", include(router.urls)),
 
     # delete comment url
-    re_path(
-        r'^posts/(?P<post_pk>[^/.]+)/comment/(?P<comment_pk>[^/.]+)/$',
-        post_views.PostViewSet.as_view({'delete': 'comment'}),
-        name='posts-comment'
-    )
+    #  re_path(
+        #  r'^posts/comment/(?P<comment_pk>[^/.]+)/$',
+        #  post_views.PostViewSet.as_view({'delete': 'comment'}),
+        #  name='posts-comment'
+    #  )
 
 ]
 

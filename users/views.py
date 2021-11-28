@@ -1,7 +1,7 @@
 """User views."""
 
 # REST Framework
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -16,6 +16,7 @@ from users.serializers import (
     UserModelSerializer,
     UserSignUpSerializer,
     FollowSerializer,
+    ProfileModelSerializer
 )
 
 # Models
@@ -24,17 +25,18 @@ from users.models import User
 
 class UserViewSet(viewsets.GenericViewSet):
     """User view set.
-    
+
     Handles sign up, login, account verification
     and profile update.
     """
 
+    queryset = User.objects.filter(is_client=True)
+
     def get_permissions(self):
         """Assign permissions based on action."""
-        if self.action in ['signup']:
+        permissions = [IsAuthenticated]
+        if self.action == 'signup':
             permissions = [AllowAny]
-        elif self.action in ['follow']:
-            permissions = [IsAuthenticated]
         return [p() for p in permissions]
 
     @action(detail=False, methods=['POST'])
@@ -66,3 +68,17 @@ class UserViewSet(viewsets.GenericViewSet):
         if request.method == 'DELETE':
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(data, status.HTTP_201_CREATED)
+    
+    @action(detail=False, methods=['PATCH'])
+    def profile(self, request, *args, **kwargs):
+        """Realizes partial updates to
+        the request user's profile.'
+        """
+        serializer = ProfileModelSerializer(
+            request.user.profile,
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
