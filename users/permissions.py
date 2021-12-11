@@ -4,12 +4,10 @@
 from rest_framework import permissions
 
 
-# Not used
-class IsAccountOwner(permissions.BasePermission):
-    """Verify if the user is owner of the account."""
+class HasAccountVerified(permissions.BasePermission):
+    """Verifies that the request user's account is verified."""
 
-    def has_object_permission(self, request, view, obj):
-        print(obj)
-        if request.user != obj:
-            return False
-        return True
+    def has_permission(self, request, view):
+        if request.user.is_verified:
+            return True
+        return False

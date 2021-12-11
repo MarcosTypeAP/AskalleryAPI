@@ -7,7 +7,7 @@ from django.db import models
 from users.models import User
 
 # Utils
-from utils.models import AskalleryModel
+from utils.models import AskalleryModel, compress_image
 
 
 class Post(AskalleryModel, models.Model):
@@ -31,7 +31,7 @@ class Post(AskalleryModel, models.Model):
         help_text='Its the main content of the post.',
     )
 
-    likes = models.ManyToManyField('users.User', related_name='likes')
+    likes = models.ManyToManyField('users.User', related_name='post_likes')
 
     likes_quantity = models.IntegerField(
         'quantity of likes',
@@ -87,12 +87,21 @@ class Post(AskalleryModel, models.Model):
         return comment
 
     def remove_comment(self, comment):
+        """Removes the given comment instance and also updates
+        this comment's 'likes_quantity' attribute.
+        """
         self.comment_set.filter(pk=comment).delete()
         self.comments_quantity -= 1
         self.save()
 
     def __str__(self):
-        """Returns the user username
-        and a short version of the caption.
+        """Returns the user username and
+        a short version of the caption.
         """
         return f'{self.user.username} - {self.caption[:10]}...'
+
+    def save(self, *args, **kwargs):
+        """Compress the image of the ´image´ field."""
+        if self.image:
+            self.image = compress_image(self.image)
+        super(Post, self).save(*args, **kwargs)

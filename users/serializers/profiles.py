@@ -26,7 +26,7 @@ class ProfileModelSerializer(serializers.ModelSerializer):
         )
 
 
-class FollowSerializer(serializers.Serializer):
+class ProfileFollowSerializer(serializers.Serializer):
     """Follow serializer.
     
     Validates if the given user exists and 

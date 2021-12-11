@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <style>
+			html {
+				font-size: 62.5%;
+			}
+			body {
+				font-family: helvetica;
+				font-size: 2rem;
+				color: #000;
+				margin: 0;
+				width: 80%;
+			}
+			div.button-div {
+				text-align: center;
+				margin-top: 4rem;
+			}
+			.button {
+				text-align: center;
+				background: #05c;
+				border-radius: 1vh;
+				color: #fff;
+				font-weight: bold;
+				font-size: 2.5vh;
+				text-decoration: none;
+				padding: 1.5vh 2vh;
+				margin: 0 auto;
+			}
+			p {
+				color: #000;
+			}
+			p.second-way-p {
+				margin-top: 80px;
+			}
+			p.second-way-p.token {
+				word-wrap: break-word;
+				color: #04c
+			}
+		</style>
+    </head>
+    <body>
+		<p>Welcome @{{ user.username }}!</p>
+
+        <p>
+            Before you start using <b>Askallery</b> we need you to do one last thing.
+            Please click the following button to verify your account.
+        </p>
+		<div class="button-div">
+			<a class="button" href="{{ http_protocol }}://{{ app_url }}:8000/api/users/verify/?token={{ token }}" style="color: #fff;">
+				Verify Account
+			</a>
+		</div>
+		<p class="second-way-p">
+			If that doesn't work, plese copy and paste the following link in your browser.
+		</p>
+		<code class="token">
+			<a href="{{ http_protocol }}://{{ app_url }}:8001/api/users/verify/?token={{ token }}" style="text-decoration: none;">
+				{{ http_protocol }}://{{ app_url }}:8000/api/users/verify/?token={{ token }}
+			</a>
+		</code>
+	</body>
+</html>
