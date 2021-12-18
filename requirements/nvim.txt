@@ -1,0 +1,8 @@
+-r ./dev.txt
+flake8==3.9.2
+jedi==0.18.0
+jedi-language-server==0.34.6
+pynvim==0.4.3
+pytest==6.2.5
+pytest-django==4.4.0
+yapf==0.31.0
