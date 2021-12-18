@@ -19,7 +19,6 @@ from utils.tests import (
 
 class StaticLiveServerPostViewsTestCase(StaticLiveServerTestCase):
     """Static live server test case for post views."""
-
     def setUp(self):
         self.create_post_url = reverse_lazy('posts:posts-list')
         self.users, _ = create_users()
@@ -27,28 +26,33 @@ class StaticLiveServerPostViewsTestCase(StaticLiveServerTestCase):
     def test_create_posts(self):
         """Verifies that the posts can be created successfully."""
         user_1, _, _ = self.users
-        data_list = create_data_list(1)
+        data_list = create_data_list(1)[0]
         c1 = APIClient()
         response = c1.post(self.create_post_url, {})
 
         self.assertEqual(response.status_code, 401)
 
         c1.force_authenticate(user=user_1)
-        response = c1.post(self.create_post_url, data_list[0])
-        data_list[0]['image'].close()
+        response = c1.post(self.create_post_url, {})
+
+        self.assertEqual(response.status_code, 403)
+
+        user_1.is_verified = True
+        user_1.save()
+        response = c1.post(self.create_post_url, data_list)
+        data_list['image'].close()
 
         self.assertEqual(response.status_code, 201)
 
         post = Post.objects.get(user=user_1)
 
-        self.assertEqual(post.caption, data_list[0]['caption'])
+        self.assertEqual(post.caption, data_list['caption'])
         self.assertIn('tmp', post.image.url)
         self.assertIn('.png', post.image.url)
 
 
 class PostViewsAPITestCase(APITestCase):
     """Post views API test case."""
-
     def setUp(self):
         self.create_post_url = reverse_lazy('posts:posts-list')
         self.list_post_url = self.create_post_url
@@ -80,20 +84,22 @@ class PostViewsAPITestCase(APITestCase):
     def test_list_posts(self):
         """Verifies that all the posts can be listed."""
         user_1, _, _ = self.users
-        data_list = create_data_list(3)
         c = APIClient()
         response = c.get(self.list_post_url)
 
         self.assertEqual(response.status_code, 401)
 
         c.force_authenticate(user=user_1)
-        c.post(self.create_post_url, data_list[0])
-        c.post(self.create_post_url, data_list[1])
-        c.post(self.create_post_url, data_list[2])
-        data_list[0]['image'].close()
-        data_list[1]['image'].close()
-        data_list[2]['image'].close()
+        Post.objects.create(user=user_1)
+        Post.objects.create(user=user_1)
+        Post.objects.create(user=user_1)
 
+        response = c.get(self.list_post_url)
+
+        self.assertEqual(response.status_code, 403)
+
+        user_1.is_verified = True
+        user_1.save()
         response = c.get(self.list_post_url)
 
         self.assertEqual(response.status_code, 200)
@@ -151,6 +157,12 @@ class PostViewsAPITestCase(APITestCase):
         c2.force_authenticate(user=user_2)
         response = c1.patch(update_post_url, data=partial_update_data)
 
+        self.assertEqual(response.status_code, 403)
+
+        user_1.is_verified = True
+        user_1.save()
+        response = c1.patch(update_post_url, data=partial_update_data)
+
         self.assertEqual(response.status_code, 404)
 
         post = Post.objects.create(user=user_1, caption='Test caption')
@@ -169,6 +181,8 @@ class PostViewsAPITestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(post.caption, partial_update_data['caption'])
 
+        user_2.is_verified = True
+        user_2.save()
         response = c2.patch(update_post_url, data=partial_update_data)
 
         self.assertEqual(response.status_code, 403)
@@ -193,6 +207,12 @@ class PostViewsAPITestCase(APITestCase):
         c2.force_authenticate(user=user_2)
         response = c1.delete(delete_post_url)
 
+        self.assertEqual(response.status_code, 403)
+
+        user_1.is_verified = True
+        user_1.save()
+        response = c1.delete(delete_post_url)
+
         self.assertEqual(response.status_code, 404)
 
         post = Post.objects.create(user=user_1)
@@ -205,6 +225,8 @@ class PostViewsAPITestCase(APITestCase):
 
         post.is_active = True
         post.save()
+        user_2.is_verified = True
+        user_2.save()
         response = c2.delete(delete_post_url)
 
         self.assertEqual(response.status_code, 403)
@@ -230,6 +252,14 @@ class PostViewsAPITestCase(APITestCase):
         c2.force_authenticate(user=user_2)
         post = Post.objects.create(user=user_1)
         like_post_c1_url = reverse_lazy('posts:posts-like', args=[post.pk])
+        response = c1.post(like_post_c1_url)
+
+        self.assertEqual(response.status_code, 403)
+
+        user_1.is_verified = True
+        user_1.save()
+        user_2.is_verified = True
+        user_2.save()
         response = c1.post(like_post_c1_url)
 
         self.assertEqual(response.status_code, 201)
@@ -263,6 +293,42 @@ class PostViewsAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_list_liked_posts(self):
+        """Verify that the posts
+        liked by a user can be listed.
+        """
+        user_1, _, _ = self.users
+        c1 = APIClient()
+        post_1 = Post.objects.create(user=user_1)
+        post_2 = Post.objects.create(user=user_1)
+        post_3 = Post.objects.create(user=user_1)
+        Post.objects.create(user=user_1)
+        post_5 = Post.objects.create(user=user_1)
+        post_1.add_like(user_1)
+        post_2.add_like(user_1)
+        post_3.add_like(user_1)
+        post_5.add_like(user_1)
+        list_liked_posts_url = reverse_lazy('posts:posts-liked')
+        response = c1.get(list_liked_posts_url)
+
+        self.assertEqual(response.status_code, 401)
+
+        c1.force_authenticate(user=user_1)
+        response = c1.get(list_liked_posts_url)
+
+        self.assertEqual(response.status_code, 403)
+
+        user_1.is_verified = True
+        user_1.save()
+        response = c1.get(list_liked_posts_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['results']), 4)
+        for post in response.json()['results']:
+            self.assertIn(
+                post['pk'], [post_1.pk, post_2.pk, post_3.pk, post_5.pk]
+            )
+
     def test_comment_post(self):
         user_1, user_2, _ = self.users
         c1 = APIClient()
@@ -275,6 +341,14 @@ class PostViewsAPITestCase(APITestCase):
 
         c1.force_authenticate(user=user_1)
         data = {'content': 'Test comment content', 'post': 99}
+        response = c1.post(comment_post_url, data=data, format='json')
+
+        self.assertEqual(response.status_code, 403)
+
+        user_1.is_verified = True
+        user_1.save()
+        user_2.is_verified = True
+        user_2.save()
         response = c1.post(comment_post_url, data=data, format='json')
 
         self.assertEqual(response.status_code, 404)
@@ -327,6 +401,40 @@ class PostViewsAPITestCase(APITestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_list_post_comments(self):
+        """Verifies that post's comments can be listed."""
+        user_1, _, _ = self.users
+        c1 = APIClient()
+        list_post_comments_url = reverse_lazy(
+            'posts:posts-comments', args=[99]
+        )
+        response = c1.get(list_post_comments_url)
+
+        self.assertEqual(response.status_code, 401)
+
+        c1.force_authenticate(user=user_1)
+        response = c1.get(list_post_comments_url)
+
+        self.assertEqual(response.status_code, 403)
+
+        user_1.is_verified = True
+        user_1.save()
+        post_1 = Post.objects.create(user=user_1)
+        post_2 = Post.objects.create(user=user_1)
+        comment_1 = Comment.objects.create(user=user_1, post=post_1)
+        comment_2 = Comment.objects.create(user=user_1, post=post_1)
+        Comment.objects.create(user=user_1, post=post_2)
+        list_post_comments_url = reverse_lazy(
+            'posts:posts-comments', args=[post_1.pk]
+        )
+        response = c1.get(list_post_comments_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['results']), 2)
+        self.assertEqual(response.json()['count'], 2)
+        for comment in response.json()['results']:
+            self.assertIn(comment['pk'], [comment_1.pk, comment_2.pk])
+
     def test_like_comment(self):
         """Verifies that a comment can be liked and unliked."""
         user_1, user_2, _ = self.users
@@ -339,6 +447,14 @@ class PostViewsAPITestCase(APITestCase):
 
         c1.force_authenticate(user=user_1)
         c2.force_authenticate(user=user_2)
+        response = c1.post(like_comment_c1_url)
+
+        self.assertEqual(response.status_code, 403)
+
+        user_1.is_verified = True
+        user_1.save()
+        user_2.is_verified = True
+        user_2.save()
         response = c1.post(like_comment_c1_url)
 
         self.assertEqual(response.status_code, 404)
@@ -379,33 +495,3 @@ class PostViewsAPITestCase(APITestCase):
         response = c2.delete(like_comment_c1_url)
 
         self.assertEqual(response.status_code, 404)
-
-    def test_list_liked_posts(self):
-        """Verify that the posts
-        liked by a user can be listed.
-        """
-        user_1, _, _ = self.users
-        c1 = APIClient()
-        post_1 = Post.objects.create(user=user_1)
-        post_2 = Post.objects.create(user=user_1)
-        post_3 = Post.objects.create(user=user_1)
-        Post.objects.create(user=user_1)
-        post_5 = Post.objects.create(user=user_1)
-        post_1.add_like(user_1)
-        post_2.add_like(user_1)
-        post_3.add_like(user_1)
-        post_5.add_like(user_1)
-        list_liked_posts_url = reverse_lazy('posts:posts-liked')
-        response = c1.get(list_liked_posts_url)
-
-        self.assertEqual(response.status_code, 401)
-
-        c1.force_authenticate(user=user_1)
-        response = c1.get(list_liked_posts_url)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()['results']), 4)
-        for post in response.json()['results']:
-            self.assertIn(
-                post['pk'], [post_1.pk, post_2.pk, post_3.pk, post_5.pk]
-            )

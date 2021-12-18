@@ -6,6 +6,7 @@ from django.core.files.storage import default_storage
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 # Selenium
 from selenium import webdriver
@@ -14,6 +15,8 @@ from selenium.webdriver.firefox.options import Options
 # Utils
 import jwt
 from datetime import timedelta
+from io import BytesIO
+from PIL import Image
 
 
 def is_asuka_picture(image=None, user=None, image_url=None):
@@ -81,3 +84,19 @@ def send_confirmation_email(user):
     msg = EmailMultiAlternatives(subject, content, from_email, [user.email])
     msg.attach_alternative(content, "text/html")
     msg.send()
+
+
+def compress_image(image):
+    """Compress the given image."""
+    img = Image.open(image)
+    img_io = BytesIO()
+    img.save(img_io, 'JPEG', quality=70)
+    return InMemoryUploadedFile(
+        file=img_io,
+        field_name=image.field_name,
+        name=image.name,
+        content_type=image.content_type,
+        size=image.size,
+        charset=image.charset,
+        content_type_extra=image.content_type_extra,
+    )

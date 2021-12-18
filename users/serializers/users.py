@@ -46,7 +46,8 @@ class MinimumUserFieldsModelSerializer(serializers.ModelSerializer):
     def get_picture(self, instance):
         """Returns user's profile picture."""
         if instance.profile.picture:
-            return instance.profile.picture
+            request = self.context.get("request")
+            return request.build_absolute_uri(instance.profile.picture.url)
         return None
 
 
@@ -55,7 +56,6 @@ class UserSignUpModelSerializer(serializers.ModelSerializer):
 
     email = serializers.EmailField(
         validators=[UniqueValidator(queryset=User.objects.all())],
-        write_only=True
     )
 
     username = serializers.CharField(

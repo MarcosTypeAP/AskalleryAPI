@@ -2,11 +2,6 @@
 
 # Django
 from django.db import models
-from django.core.files import File
-
-# Utils
-from io import BytesIO
-from PIL import Image
 
 
 class AskalleryModel(models.Model):
@@ -40,12 +35,3 @@ class AskalleryModel(models.Model):
 
         get_latest_by = 'created'
         ordering = ('-created', '-modified')
-
-
-def compress_image(image):
-    """Compress the given image."""
-    img = Image.open(image)
-    img_io = BytesIO()
-    img.save(img_io, 'JPEG', quality=70)
-    compressed_img = File(img_io, name=image.name)
-    return compressed_img

@@ -14,7 +14,7 @@ from posts.models import Post
 from users.serializers import MinimumUserFieldsModelSerializer
 
 # Utils
-from utils.serializers import is_asuka_picture
+from utils.serializers import is_asuka_picture, compress_image
 
 
 class PostModelSerializer(serializers.ModelSerializer):
@@ -40,20 +40,25 @@ class PostCreationModelSerializer(serializers.ModelSerializer):
 
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
+    class Meta:
+        """Meta options."""
+        model = Post
+        fields = ('user', 'caption', 'image')
+
     def validate(self, data):
         if settings.LOCAL_DEV:
             return data
         if is_asuka_picture(image=data['image'], user=data['user']):
             return data
         raise serializers.ValidationError(
-            {'image': 'The image must be about ´Asuka Langley´' +
+            {'image': 'The image must be about ´Asuka Langley´ ' +
              'from ´Neon Genesis Evangelion´.'}
         )
 
-    class Meta:
-        """Meta options."""
-        model = Post
-        fields = ('user', 'caption', 'image')
+    def create(self, data):
+        """Compress the image of the ´image´ field."""
+        data['image'] = compress_image(data['image'])
+        return super(PostCreationModelSerializer, self).create(data)
 
 
 class PostLikeSerializer(serializers.Serializer):

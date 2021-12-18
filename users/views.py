@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 
 # Filters
-from rest_framework.filters import SearchFilter
+from users.filters import CustomSearchFilter
 
 # Renderers
 from rest_framework.renderers import (JSONRenderer, TemplateHTMLRenderer)
@@ -41,9 +41,9 @@ class UserViewSet(
     and profile update.
     """
 
-    filter_backends = [SearchFilter]
+    filter_backends = [CustomSearchFilter]
 
-    search_fields = ['username', 'email', 'first_name', 'last_name']
+    #  search_fields = ['username', 'first_name', 'last_name']
 
     def get_permissions(self):
         """Assign permissions based on action."""

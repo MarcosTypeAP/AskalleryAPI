@@ -7,7 +7,7 @@ from django.db import models
 from users.models import User
 
 # Utils
-from utils.models import AskalleryModel, compress_image
+from utils.models import AskalleryModel
 
 
 class Post(AskalleryModel, models.Model):
@@ -99,9 +99,3 @@ class Post(AskalleryModel, models.Model):
         a short version of the caption.
         """
         return f'{self.user.username} - {self.caption[:10]}...'
-
-    def save(self, *args, **kwargs):
-        """Compress the image of the ´image´ field."""
-        if self.image:
-            self.image = compress_image(self.image)
-        super(Post, self).save(*args, **kwargs)

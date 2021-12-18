@@ -25,7 +25,7 @@ LOCAL_DEV = env.bool('LOCAL_DEV', False)
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', False)
 APP_URL = env('APP_URL')
-HTTP_PROTOCOL = 'http'
+HTTP_PROTOCOL = env('HTTP_PROTOCOL', default='https')
 
 ALLOWED_HOSTS = [
     APP_URL,
@@ -40,22 +40,10 @@ CORS_ALLOWED_HOSTS = [
 
 
 # Email
-if not LOCAL_DEV:
-    EMAIL_BACKEND = env(
-        'EMAIL_BACKEND',
-        default='django.core.mail.backends.smtp.EmailBackend'
-    )
-    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
-    EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
-    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-    EMAIL_PORT = env('EMAIL_PORT', default=587)
-    EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = 'Askalery LiveServer <liveserver@localhost.com>'
-    EMAIL_HOST = "localhost"
-    EMAIL_PORT = 1025
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'Askalery LiveServer <liveserver@localhost.com>'
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 1025
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -75,6 +63,7 @@ AUTH_USER_MODEL = 'users.User'
 
 # Application definition
 INSTALLED_APPS = [
+
     # django
     'django.contrib.admin',
     'django.contrib.auth',
@@ -90,9 +79,11 @@ INSTALLED_APPS = [
     # third party apps
     'rest_framework',
     'rest_framework_simplejwt',
-    'django_extensions',
 
 ]
+
+if LOCAL_DEV:
+    INSTALLED_APPS += ['django_extensions']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -169,11 +160,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# LOGIN_URL = '/users/login/'
-# LOGIN_REDIRECT_URL = '/'
-# LOGOUT_REDIRECT_URL = LOGIN_URL
 
 
 # Static files (CSS, JavaScript, Images)

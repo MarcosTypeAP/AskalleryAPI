@@ -2,8 +2,8 @@
 
 # REST Framework
 from rest_framework import viewsets, mixins, status
-from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
 
@@ -16,12 +16,13 @@ from posts.permissions import IsPostOwner
 
 # Serializers
 from posts.serializers import (
-    PostCreationModelSerializer, PostModelSerializer, PostLikeSerializer
+    PostCreationModelSerializer, PostModelSerializer, PostLikeSerializer,
+    CommentModelSerializer
 )
+from users.permissions import HasAccountVerified
 
 # Models
-from posts.models import Post
-from users.models import User
+from posts.models import Post, Comment
 
 
 class PostViewSet(
@@ -40,7 +41,7 @@ class PostViewSet(
 
     def get_permissions(self):
         """Assign permissions based on action."""
-        permissions = [IsAuthenticated]
+        permissions = [IsAuthenticated, HasAccountVerified]
         if self.action == 'retrieve':
             permissions = [AllowAny]
         if self.action in ['update', 'partial_update', 'destroy']:
@@ -54,6 +55,11 @@ class PostViewSet(
             queryset = Post.objects.filter(
                 likes=self.request.user, is_active=True
             )
+        elif self.action == 'comments':
+            post = get_object_or_404(
+                Post, pk=self.kwargs.get('pk'), is_active=True
+            )
+            queryset = Comment.objects.filter(post=post)
         return queryset
 
     def get_serializer_class(self):
@@ -66,6 +72,8 @@ class PostViewSet(
             return PostCreationModelSerializer
         elif self.action == 'like':
             return PostLikeSerializer
+        elif self.action == 'comments':
+            return CommentModelSerializer
 
     def perform_destroy(self, instance):
         """Changes the instance's 'is_active' attribute to 'False'
@@ -90,4 +98,9 @@ class PostViewSet(
     @action(detail=False, methods=['GET'])
     def liked(self, request, *args, **kwargs):
         """List all liked posts by the request user."""
+        return self.list(request, *args, **kwargs)
+
+    @action(detail=True, methods=['GET'])
+    def comments(self, request, *args, **kwargs):
+        """List all comments of the given post."""
         return self.list(request, *args, **kwargs)

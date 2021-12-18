@@ -10,6 +10,7 @@ from rest_framework.permissions import (
     IsAuthenticated
 )
 from posts.permissions import IsCommentOrPostOwner
+from users.permissions import HasAccountVerified
 
 # Serializers
 from posts.serializers import (
@@ -26,11 +27,9 @@ class CommentViewSet(mixins.CreateModelMixin,
                      viewsets.GenericViewSet):
     """Comment view set."""
 
-    queryset = Comment.objects.filter(post__is_active=True)
-
     def get_permissions(self):
         """Assign permissions based on action."""
-        permissions = [IsAuthenticated]
+        permissions = [IsAuthenticated, HasAccountVerified]
         if self.action == "destroy":
             permissions.append(IsCommentOrPostOwner)
         return [p() for p in permissions]
@@ -41,6 +40,11 @@ class CommentViewSet(mixins.CreateModelMixin,
         if self.action == "like":
             serializer_class = CommentLikeSerializer
         return serializer_class
+
+    def get_queryset(self):
+        """Assigns queryset based on action."""
+        queryset = Comment.objects.filter(post__is_active=True)
+        return queryset
 
     def perform_destroy(self, instance):
         """Deletes the given comment from

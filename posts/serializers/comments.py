@@ -17,7 +17,8 @@ class CommentModelSerializer(serializers.ModelSerializer):
     user = MinimumUserFieldsModelSerializer(read_only=True)
 
     request_user = serializers.HiddenField(
-        default=serializers.CurrentUserDefault()
+        default=serializers.CurrentUserDefault(),
+        write_only=True
     )
 
     class Meta:
@@ -25,7 +26,6 @@ class CommentModelSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('pk', 'user', 'content', 'request_user', 'post')
         read_only_fields = ('pk', 'user')
-        write_only_fields = ('request_user')
 
     def to_internal_value(self, data):
         if 'post' in data:

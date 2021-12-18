@@ -50,7 +50,7 @@ class ProfileFollowSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid user.")
 
         if followed_user == data['request_user']:
-            raise serializers.ValidationError("An user cannot follow itself.")
+            raise serializers.ValidationError("A user cannot follow itself.")
 
         self.context['followed_user'] = followed_user
 

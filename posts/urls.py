@@ -21,11 +21,11 @@ urlpatterns = [
 
     path("", include(router.urls)),
 
-    # delete comment url
+    # Retrieve post comments url
     #  re_path(
-        #  r'^posts/comment/(?P<comment_pk>[^/.]+)/$',
-        #  post_views.PostViewSet.as_view({'delete': 'comment'}),
-        #  name='posts-comment'
+        #  r'^comments/post/(?P<comment_pk>[^/.]+)/$',
+        #  CommentViewSet.as_view({'get': 'post'}),
+        #  name='comments-post'
     #  )
 
 ]
