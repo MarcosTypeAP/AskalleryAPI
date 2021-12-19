@@ -24,8 +24,8 @@ LOCAL_DEV = env.bool('LOCAL_DEV', False)
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', False)
-APP_URL = env('APP_URL')
-HTTP_PROTOCOL = env('HTTP_PROTOCOL', default='https')
+APP_URL = env('APP_URL', '0.0.0.0')
+HTTP_PROTOCOL = env('HTTP_PROTOCOL', 'https')
 
 ALLOWED_HOSTS = [
     APP_URL,
