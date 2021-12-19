@@ -16,16 +16,16 @@ ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', False)
+READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
 if READ_DOT_ENV_FILE:
     env.read_env(str(ROOT_DIR / '.env'))
 
-LOCAL_DEV = env.bool('LOCAL_DEV', False)
+LOCAL_DEV = env.bool('LOCAL_DEV', default=False)
 
 SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG', False)
-APP_URL = env('APP_URL', '0.0.0.0')
-HTTP_PROTOCOL = env('HTTP_PROTOCOL', 'https')
+DEBUG = env.bool('DEBUG', default=False)
+APP_URL = env('APP_URL', default='0.0.0.0')
+HTTP_PROTOCOL = env('HTTP_PROTOCOL', default='https')
 
 ALLOWED_HOSTS = [
     APP_URL,
