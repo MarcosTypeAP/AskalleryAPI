@@ -81,11 +81,11 @@ def create_env_file():
     """Creates a .env file with the essential variables."""
     with open('.env', 'w') as f:
         new_lines = [
-            'SECRET_KEY=eMeVgUdFOZy2/kBZpfmMH4OSdU4TZHuwtYWKQ2jWBk9HR65goLGprg3eHWv3o/Ti40PbRswFdYuKn2Yy0mPfEw==',
-            'LOCAL_DEV=1',
-            'APP_URL=localhost',
-            'DEBUG=1',
-            'HTTP_PROTOCOL=http'
+            'SECRET_KEY=eMeVgUdFOZy2/kBZpfmMH4OSdU4TZHuwtYWKQ2jWBk9HR65goLGprg3eHWv3o/Ti40PbRswFdYuKn2Yy0mPfEw==\n',
+            'LOCAL_DEV=1\n',
+            'APP_URL=localhost\n',
+            'DEBUG=1\n',
+            'HTTP_PROTOCOL=http\n'
         ]
         f.writelines(new_lines)
 
