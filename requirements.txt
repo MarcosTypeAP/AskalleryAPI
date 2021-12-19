@@ -13,6 +13,7 @@ selenium==4.1.0
 # production
 cloudinary==1.28.0
 django-cloudinary-storage==0.3.0
+mysqlclient
 gunicorn==20.1.0
 
 # test
