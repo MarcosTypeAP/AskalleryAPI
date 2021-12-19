@@ -145,15 +145,7 @@ def environment_variables_exist():
 
 def main():
     if not environment_variables_exist():
-        print(
-            """
-            Environment variables are missing.
-
-            The following environment variables must exist:
-
-                - SECRET_KEY     string
-            """
-        )
+        return 0
 
     if len(sys.argv) == 1:
         address = '0.0.0.0:8000'
