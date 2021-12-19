@@ -87,9 +87,13 @@ def create_env_file():
 def set_vars_tutorial():
     """Prints how to set DJANGO_READ_DOT_ENV_FILE based on OS."""
     if platform.system() == 'Windows':
-        print("""To set "DJANGO_READ_DOT_ENV_FILE" to 1, run:\n\t[System.Environment]::SetEnvironmentVariable('DJANGO_READ_DOT_ENV_FILE','1'""")
+        print('To set "DJANGO_READ_DOT_ENV_FILE" to 1, run:')
+        print("\t[System.Environment]::SetEnvironmentVariable('DJANGO_READ_DOT_ENV_FILE','1'")
+        print('And run setup.py again.')
     else:
-        print("""To set "DJANGO_READ_DOT_ENV_FILE" to 1, run:\n\texport DJANGO_READ_DOT_ENV_FILE=1""")
+        print('To set "DJANGO_READ_DOT_ENV_FILE" to 1, run:')
+        print('\texport DJANGO_READ_DOT_ENV_FILE=1')
+        print('And run setup.py again.')
 
 
 def environment_variables_exist():
@@ -107,14 +111,12 @@ def environment_variables_exist():
             return False
         else:
             if not os.environ.get('SECRET_KEY'):
-                print(
-                    '\tThe "SECRET_KEY" is not set.\n\tSet it and try again.'
-                )
+                print('\tThe "SECRET_KEY" is not set.')
+                print('\tSet it and try again.')
                 return False
             if os.environ.get('LOCAL_DEV') != '1':
-                print(
-                    '\tThe "LOCAL_DEV" is not set.\n\tSet it and try again.'
-                )
+                print('\tThe "LOCAL_DEV" is not set.')
+                print('\tSet it and try again.')
                 return False
             return True
     else:
