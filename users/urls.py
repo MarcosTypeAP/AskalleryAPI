@@ -33,6 +33,3 @@ urlpatterns = [
     ),
 
 ]
-
-for url in router.urls + urlpatterns:
-    print(url)

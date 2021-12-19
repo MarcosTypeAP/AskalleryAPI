@@ -1,7 +1,7 @@
 """Post URLs."""
 
 # Django
-from django.urls import include, path, re_path
+from django.urls import include, path
 
 # REST Framework
 from rest_framework import routers
@@ -29,11 +29,3 @@ urlpatterns = [
     #  )
 
 ]
-
-for url in router.urls:
-    print(url)
-
-print('\n')
-
-for url in urlpatterns:
-    print(url)
