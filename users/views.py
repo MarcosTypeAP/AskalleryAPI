@@ -43,13 +43,11 @@ class UserViewSet(
 
     filter_backends = [CustomSearchFilter]
 
-    #  search_fields = ['username', 'first_name', 'last_name']
-
     def get_permissions(self):
         """Assign permissions based on action."""
         permissions = [IsAuthenticated, HasAccountVerified]
         if self.action in [
-            'signup', 'verify', 'list', 'posts', 'retrieve', 'email'
+            'signup', 'verify', 'list', 'posts', 'retrieve'
         ]:
             permissions = [AllowAny]
         return [p() for p in permissions]
@@ -172,10 +170,3 @@ class UserViewSet(
     def posts(self, request, *args, **kwargs):
         """List all post of the request user."""
         return self.list(request, *args, **kwargs)
-
-    @action(detail=False, methods=['GET'])
-    def email(self, request, *args, **kwargs):
-        from utils.serializers import send_confirmation_email
-        user = User.objects.get(email='sombrotest@gmail.com')
-        send_confirmation_email(user)
-        return Response(status=status.HTTP_200_OK)

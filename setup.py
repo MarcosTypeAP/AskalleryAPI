@@ -137,6 +137,13 @@ def environment_variables_exist():
             return True
     else:
         if os.path.exists('.env'):
+            overwrite = get_choice(
+                'A .env file already exists. Overwrite it? [N/y]: ',
+                yes_default=False
+            )
+            if overwrite:
+                create_env_file()
+                return True
             return validate_env_file()
         else:
             create_env_file()

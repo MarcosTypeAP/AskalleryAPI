@@ -59,28 +59,6 @@ class PostViewsAPITestCase(APITestCase):
         self.like_post_url = reverse_lazy('posts:posts-like')
         self.users, _ = create_users()
 
-    def test_create_posts(self):
-        """Verifies that the posts can be created successfully."""
-        return
-        user_1, _, _ = self.users
-        data_list = create_data_list(1)
-        c1 = APIClient()
-        response = c1.post(self.create_post_url, {})
-
-        self.assertEqual(response.status_code, 401)
-
-        c1.force_authenticate(user=user_1)
-        response = c1.post(self.create_post_url, data_list[0])
-        data_list[0]['image'].close()
-
-        self.assertEqual(response.status_code, 201)
-
-        post = Post.objects.get(user=user_1)
-
-        self.assertEqual(post.caption, data_list[0]['caption'])
-        self.assertIn('tmp', post.image.url)
-        self.assertIn('.png', post.image.url)
-
     def test_list_posts(self):
         """Verifies that all the posts can be listed."""
         user_1, _, _ = self.users
