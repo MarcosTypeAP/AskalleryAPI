@@ -60,18 +60,12 @@ def validate_env_file():
 
         if not LOCAL_DEV:
             print(
-                """
-                The "LOCAL_DEV" is missing in the .env file or is set to False.
-                Set it and try again.
-                """
+                '\tThe "LOCAL_DEV" is missing in the .env file or is set to False.\n\tSet it and try again.'
             )
             return False
         if not SECRET_KEY:
             print(
-                """
-                The "SECRET_KEY" is missing in the .env file.
-                Set it and try again.
-                """
+                '\tThe "SECRET_KEY" is missing in the .env file.\n\tSet it and try again.'
             )
             return False
     return True
@@ -90,48 +84,36 @@ def create_env_file():
         f.writelines(new_lines)
 
 
+def set_vars_tutorial():
+    """Prints how to set DJANGO_READ_DOT_ENV_FILE based on OS."""
+    if platform.system() == 'Windows':
+        print("""To set "DJANGO_READ_DOT_ENV_FILE" to 1, run:\n\t[System.Environment]::SetEnvironmentVariable('DJANGO_READ_DOT_ENV_FILE','1'""")
+    else:
+        print("""To set "DJANGO_READ_DOT_ENV_FILE" to 1, run:\n\texport DJANGO_READ_DOT_ENV_FILE=1""")
+
+
 def environment_variables_exist():
     """Verifies that the environment variables exist
     or creates a .env file with the essential variables.
     """
-    if not os.environ.get('DJANGO_READ_DOT_ENV_FILE'):
+    if os.environ.get('DJANGO_READ_DOT_ENV_FILE') != '1':
         create_env = get_choice(
             extra_info='The "DJANGO_READ_DOT_ENV_FILE" variable is not set.',
-            message='Set it 1 and create a .env file? [Y/n]: ',
+            message='Do you want to set it? [Y/n]: ',
             yes_default=True
         )
         if create_env:
-            if os.path.exists('.env'):
-                overwrite = get_choice(
-                    'A .env file already exists. Overwrite it? [N/y]: ',
-                    yes_default=False
-                )
-                if overwrite:
-                    create_env_file()
-                    return True
-                return validate_env_file()
-            else:
-                create_env_file()
-                if platform.system() == 'Windows':
-                    os.system("[System.Environment]::SetEnvironmentVariable('DJANGO_READ_DOT_ENV_FILE','1'")
-                else:
-                    os.system('export DJANGO_READ_DOT_ENV_FILE=1')
-                return True
+            set_vars_tutorial()
+            return False
         else:
             if not os.environ.get('SECRET_KEY'):
                 print(
-                    """
-                    The "SECRET_KEY" is not set.
-                    Set it and try again.
-                    """
+                    '\tThe "SECRET_KEY" is not set.\n\tSet it and try again.'
                 )
                 return False
-            if not os.environ.get('LOCAL_DEV'):
+            if os.environ.get('LOCAL_DEV') != '1':
                 print(
-                    """
-                    The "LOCAL_DEV" is not set.
-                    Set it and try again.
-                    """
+                    '\tThe "LOCAL_DEV" is not set.\n\tSet it and try again.'
                 )
                 return False
             return True
