@@ -156,6 +156,16 @@ def main():
     if not os.path.exists('static'):
         os.mkdir('static')
 
+    if not os.path.exists('users/migrations'):
+        os.mkdir('users/migrations')
+        with open('users/migrations/__init__.py', 'w'):
+            pass
+
+    if not os.path.exists('posts/migrations'):
+        os.mkdir('posts/migrations')
+        with open('posts/migrations/__init__.py', 'w'):
+            pass
+
     if platform.system() == 'Windows':
         python = 'python'
         pip = 'pip'
