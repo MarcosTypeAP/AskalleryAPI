@@ -26,6 +26,7 @@ def is_asuka_picture(image=None, user=None, image_url=None):
 
     google_search_url = 'https://www.google.com/searchbyimage'
     extra_query_params = '&encoded_image=&image_content=&filename=&hl=en-AR'
+    import pdb; pdb.set_trace()
 
     if image_url is not None:
         search_by_image_url = '{}?image_url={}{}'.format(

@@ -46,6 +46,7 @@ class PostCreationModelSerializer(serializers.ModelSerializer):
         fields = ('user', 'caption', 'image')
 
     def validate(self, data):
+        import pdb; pdb.set_trace()
         if settings.LOCAL_DEV:
             return data
         if is_asuka_picture(image=data['image'], user=data['user']):

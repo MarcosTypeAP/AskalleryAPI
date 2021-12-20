@@ -41,6 +41,7 @@ class StaticLiveServerPostViewsTestCase(StaticLiveServerTestCase):
         user_1.save()
         response = c1.post(self.create_post_url, data_list)
         data_list['image'].close()
+        import pdb; pdb.set_trace()
 
         self.assertEqual(response.status_code, 201)
 
