@@ -116,6 +116,11 @@ class PostViewSet(
 def serve_temporal_image(response, *args, **kwargs):
     """Serves a temporal image if this is in /app/tmp_images/"""
     image_path = '/app/tmp_images/{}'.format(kwargs.get('image'))
+    print('/'*100)
+    print(image_path)
+    print(kwargs)
+    print(file_exists(image_path))
+    print('/'*100)
     if file_exists(image_path):
         with open(image_path, 'rb') as img:
             response = FileResponse(img)

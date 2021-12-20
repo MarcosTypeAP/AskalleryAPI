@@ -36,6 +36,3 @@ urlpatterns = [
     )
 
 ]
-
-for url in urlpatterns:
-    print(url)
