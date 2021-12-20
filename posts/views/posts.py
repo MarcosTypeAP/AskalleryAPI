@@ -122,4 +122,4 @@ def serve_temporal_image(response, *args, **kwargs):
         remove_file(image_path)
         return response
     else:
-        return Http404()
+        raise Http404('Image not found')
