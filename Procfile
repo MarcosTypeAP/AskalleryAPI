@@ -1,1 +1,1 @@
-web: gunicorn djangoNotesApp.wsgi 
+web: gunicorn askallery.wsgi 
