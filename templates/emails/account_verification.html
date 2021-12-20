@@ -47,7 +47,7 @@
             Please click the following button to verify your account.
         </p>
 		<div class="button-div">
-			<a class="button" href="{{ http_protocol }}://{{ app_url }}:8000/api/users/verify/?token={{ token }}" style="color: #fff;">
+			<a class="button" href="{{ http_protocol }}://{{ app_url }}/api/users/verify/?token={{ token }}" style="color: #fff;">
 				Verify Account
 			</a>
 		</div>
@@ -55,8 +55,8 @@
 			If that doesn't work, plese copy and paste the following link in your browser.
 		</p>
 		<code class="token">
-			<a href="{{ http_protocol }}://{{ app_url }}:8001/api/users/verify/?token={{ token }}" style="text-decoration: none;">
-				{{ http_protocol }}://{{ app_url }}:8000/api/users/verify/?token={{ token }}
+			<a href="{{ http_protocol }}://{{ app_url }}/api/users/verify/?token={{ token }}" style="text-decoration: none;">
+				{{ http_protocol }}://{{ app_url }}/api/users/verify/?token={{ token }}
 			</a>
 		</code>
 	</body>
