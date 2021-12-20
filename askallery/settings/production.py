@@ -22,9 +22,7 @@ EMAIL_PORT = env('EMAIL_PORT', default=587)
 EMAIL_USE_TLS = env('EMAIL_USE_TLS', default=True)
 
 # REST Framework
-REST_FRAMEWORK = {
-    'PAGE_SIZE': 30,
-}
+REST_FRAMEWORK['PAGE_SIZE'] = 30 # NOQA
 
 # Application
 INSTALLED_APPS += [ # NOQA
