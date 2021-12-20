@@ -48,16 +48,16 @@ def is_asuka_picture(image=None, user=None, image_url=None):
     options.add_argument("--headless")
     options.add_argument("-disable-gpu")
     options.add_argument("-no-sandbox")
-    if settings.LOCAL_DEV:
-        driver = webdriver.Firefox(options=options)
-    else:
-        driver_service = Service(os.environ.get('GECKODRIVER_PATH'))
-        firefox_binary = FirefoxBinary(os.environ.get('FIREFOX_BIN'))
-        driver = webdriver.Firefox(
-            options=options,
-            firefox_binary=firefox_binary,
-            service=driver_service
-        )
+    #  if settings.LOCAL_DEV:
+    driver = webdriver.Firefox(options=options)
+    #  else:
+        #  driver_service = Service(os.environ.get('GECKODRIVER_PATH'))
+        #  firefox_binary = FirefoxBinary(os.environ.get('FIREFOX_BIN'))
+        #  driver = webdriver.Firefox(
+            #  options=options,
+            #  firefox_binary=firefox_binary,
+            #  service=driver_service
+        #  )
     driver.get(search_by_image_url)
     result = driver.find_element('name', 'q').get_attribute('value').upper()
 
