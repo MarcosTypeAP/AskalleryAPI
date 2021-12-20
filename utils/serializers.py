@@ -12,12 +12,14 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 # Utils
 import jwt
 from datetime import timedelta
 from io import BytesIO
 from PIL import Image
+import os
 
 
 def is_asuka_picture(image=None, user=None, image_url=None):
@@ -44,11 +46,18 @@ def is_asuka_picture(image=None, user=None, image_url=None):
 
     options = Options()
     options.add_argument("--headless")
+    options.add_argument("-disable-gpu")
+    options.add_argument("-no-sandbox")
     if settings.LOCAL_DEV:
-        driver_service = Service('geckodriver')
+        driver = webdriver.Firefox(options=options)
     else:
-        driver_service = Service('/app/geckodriver')
-    driver = webdriver.Firefox(options=options, service=driver_service)
+        driver_service = Service(os.environ.get('GECKODRIVER_PATH'))
+        firefox_binary = FirefoxBinary(os.environ.get('FIREFOX_BIN'))
+        driver = webdriver.Firefox(
+            options=options,
+            firefox_binary=firefox_binary,
+            service=driver_service
+        )
     driver.get(search_by_image_url)
     result = driver.find_element('name', 'q').get_attribute('value').upper()
 
