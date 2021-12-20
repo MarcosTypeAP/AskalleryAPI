@@ -11,6 +11,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 # Selenium
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
 
 # Utils
 import jwt
@@ -43,7 +44,8 @@ def is_asuka_picture(image=None, user=None, image_url=None):
 
     options = Options()
     options.add_argument("--headless")
-    driver = webdriver.Firefox(options=options)
+    driver_service = Service('geckodriver')
+    driver = webdriver.Firefox(options=options, service=driver_service)
     driver.get(search_by_image_url)
     result = driver.find_element('name', 'q').get_attribute('value').upper()
 
