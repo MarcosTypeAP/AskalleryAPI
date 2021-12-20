@@ -7,6 +7,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
 
+# Django
+from django.http import FileResponse
+
 # Permissions
 from rest_framework.permissions import (
     AllowAny,
@@ -104,3 +107,12 @@ class PostViewSet(
     def comments(self, request, *args, **kwargs):
         """List all comments of the given post."""
         return self.list(request, *args, **kwargs)
+
+
+def serve_temporal_image(response, *args, **kwargs):
+    import ipdb; ipdb.set_trace()
+    img = open('media/hello.jpg', 'rb')
+
+    response = FileResponse(img)
+
+    return response

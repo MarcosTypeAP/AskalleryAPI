@@ -9,7 +9,8 @@ from rest_framework import routers
 # Views
 from posts.views import (
     PostViewSet,
-    CommentViewSet
+    CommentViewSet,
+    serve_temporal_image
 )
 
 
@@ -28,4 +29,13 @@ urlpatterns = [
         #  name='comments-post'
     #  )
 
+    path(
+        'tmpimage/<str:image>',
+        serve_temporal_image,
+        name='serve-tmp-image'
+    )
+
 ]
+
+for url in urlpatterns:
+    print(url)
