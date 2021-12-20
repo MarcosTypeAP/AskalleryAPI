@@ -44,7 +44,10 @@ def is_asuka_picture(image=None, user=None, image_url=None):
 
     options = Options()
     options.add_argument("--headless")
-    driver_service = Service('geckodriver')
+    if settings.LOCAL_DEV:
+        driver_service = Service('geckodriver')
+    else:
+        driver_service = Service('/app/geckodriver')
     driver = webdriver.Firefox(options=options, service=driver_service)
     driver.get(search_by_image_url)
     result = driver.find_element('name', 'q').get_attribute('value').upper()
