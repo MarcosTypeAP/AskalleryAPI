@@ -35,12 +35,13 @@ def is_asuka_picture(image=None, user=None, image_url=None):
     else:
         filename = 'tmp-img-{}-{}'.format(user.pk, image.name)
 
-        with default_storage.open(filename, 'wb+') as destination:
+        with open(f'/app/tmp_images/{filename}', 'wb+') as tmp_img:
             for chunck in image.chunks():
-                destination.write(chunck)
+                tmp_img.write(chunck)
 
+        tmp_images_url = 'api/tmpimage/'
         search_by_image_url = '{}?image_url=https://{}{}{}{}'.format(
-            google_search_url, settings.APP_URL, default_storage.base_url,
+            google_search_url, settings.APP_URL, tmp_images_url,
             filename, extra_query_params
         )
 

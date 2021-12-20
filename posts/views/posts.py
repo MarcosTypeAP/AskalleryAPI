@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
 
 # Django
-from django.http import FileResponse
+from django.http import FileResponse, Http404
 
 # Permissions
 from rest_framework.permissions import (
@@ -26,6 +26,10 @@ from users.permissions import HasAccountVerified
 
 # Models
 from posts.models import Post, Comment
+
+# Utils
+from os import remove as remove_file
+from os.path import exists as file_exists
 
 
 class PostViewSet(
@@ -110,9 +114,13 @@ class PostViewSet(
 
 
 def serve_temporal_image(response, *args, **kwargs):
-    import ipdb; ipdb.set_trace()
-    img = open('media/hello.jpg', 'rb')
-
-    response = FileResponse(img)
-
-    return response
+    """Serves a temporal image if this is in /app/tmp_images/"""
+    import pdb; pdb.set_trace()
+    image_path = '/app/tmp_images/{}'.format(kwargs.get('image'))
+    if file_exists(image_path):
+        with open(image_path, 'rb') as img:
+            response = FileResponse(img)
+        remove_file(image_path)
+        return response
+    else:
+        return Http404()
