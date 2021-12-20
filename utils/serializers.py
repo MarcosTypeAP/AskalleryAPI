@@ -54,7 +54,8 @@ def is_asuka_picture(image=None, user=None, image_url=None):
     #  else:
         #  driver_service = Service(os.environ.get('GECKODRIVER_PATH'))
     binary = FirefoxBinary(os.environ.get('FIREFOX_BIN'))
-    geckodriver = os.environ.get('GECKODRIVER_PATH')
+    #  geckodriver = os.environ.get('GECKODRIVER_PATH')
+    geckodriver = '/app/geckodriver'
     driver = webdriver.Firefox(
         options=options,
         firefox_binary=binary,
