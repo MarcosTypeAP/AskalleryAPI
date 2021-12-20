@@ -15,10 +15,14 @@ from utils.tests import (
     create_users,
     create_data_list,
 )
+import os
 
 
 class StaticLiveServerPostViewsTestCase(StaticLiveServerTestCase):
     """Static live server test case for post views."""
+
+    port = os.environ.get('PORT')
+
     def setUp(self):
         self.create_post_url = reverse_lazy('posts:posts-list')
         self.users, _ = create_users()
