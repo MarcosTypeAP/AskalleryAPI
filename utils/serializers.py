@@ -39,7 +39,7 @@ def is_asuka_picture(image=None, user=None, image_url=None):
             for chunck in image.chunks():
                 tmp_img.write(chunck)
 
-        tmp_images_url = 'api/tmpimage/'
+        tmp_images_url = '/api/tmpimage/'
         search_by_image_url = '{}?image_url=https://{}{}{}{}'.format(
             google_search_url, settings.APP_URL, tmp_images_url,
             filename, extra_query_params

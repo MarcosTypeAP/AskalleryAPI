@@ -115,7 +115,6 @@ class PostViewSet(
 
 def serve_temporal_image(response, *args, **kwargs):
     """Serves a temporal image if this is in /app/tmp_images/"""
-    import pdb; pdb.set_trace()
     image_path = '/app/tmp_images/{}'.format(kwargs.get('image'))
     if file_exists(image_path):
         with open(image_path, 'rb') as img:
