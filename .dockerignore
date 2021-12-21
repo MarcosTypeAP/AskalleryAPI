@@ -8,5 +8,7 @@
 **__pycache__
 **.pytest_cache
 **migrations
+staticfiles
 media
 notes.txt
+docker
