@@ -120,6 +120,10 @@ def serve_temporal_image(response, *args, **kwargs):
     print(image_path)
     print(kwargs)
     print(file_exists(image_path))
+    import pathlib
+    print(pathlib.Path().resolve())
+    import os
+    print(os.system('pwd'))
     print('/'*100)
     if file_exists(image_path):
         with open(image_path, 'rb') as img:
