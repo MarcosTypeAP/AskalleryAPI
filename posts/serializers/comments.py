@@ -24,8 +24,11 @@ class CommentModelSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta options."""
         model = Comment
-        fields = ('pk', 'user', 'content', 'request_user', 'post')
-        read_only_fields = ('pk', 'user')
+        fields = (
+            'pk', 'user', 'content', 'request_user',
+            'post', 'likes_quantity'
+        )
+        read_only_fields = ('pk', 'user', 'likes_quantity')
 
     def to_internal_value(self, data):
         if 'post' in data:
@@ -53,10 +56,9 @@ class CommentLikeSerializer(serializers.Serializer):
 
     def validate_pk(self, value):
         """Verifies the liked comment exists."""
-        liked_comment = get_object_or_404(
+        self.context['liked_comment'] = get_object_or_404(
             Comment, pk=value, post__is_active=True
         )
-        self.context['liked_comment'] = liked_comment
         return value
 
     def create(self, data):

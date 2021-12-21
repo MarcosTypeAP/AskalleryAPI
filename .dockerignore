@@ -1,0 +1,12 @@
+.git
+.vscode
+.vim
+.venv
+.env
+*.sqlite3
+**.mypy_cache
+**__pycache__
+**.pytest_cache
+**migrations
+media
+notes.txt

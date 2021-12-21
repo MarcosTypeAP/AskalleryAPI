@@ -65,26 +65,28 @@ class Profile(AskalleryModel, models.Model):
         also updates their 'following', 'followers',
         following_quantity and 'followers_quantity 'attributes.
         """
-        self.following.add(followed_user)
-        self.following_quantity += 1
-        self.save()
+        if not self.following.filter(pk=followed_user.pk).exists():
+            self.following.add(followed_user)
+            self.following_quantity += 1
+            self.save()
 
-        followed_user.profile.followers.add(self.user)
-        followed_user.profile.followers_quantity += 1
-        followed_user.save()
+            followed_user.profile.followers.add(self.user)
+            followed_user.profile.followers_quantity += 1
+            followed_user.save()
 
     def stop_following(self, followed_user):
         """Removes a relationship between this user and passed user,
         also updates their 'following', 'followers',
         following_quantity and 'followers_quantity 'attributes.
         """
-        self.following.remove(followed_user)
-        self.following_quantity -= 1
-        self.save()
+        if self.following.filter(pk=followed_user.pk).exists():
+            self.following.remove(followed_user)
+            self.following_quantity -= 1
+            self.save()
 
-        followed_user.profile.followers.remove(self.user)
-        followed_user.profile.followers_quantity -= 1
-        followed_user.save()
+            followed_user.profile.followers.remove(self.user)
+            followed_user.profile.followers_quantity -= 1
+            followed_user.save()
 
     def __str__(self):
         """Retuens username."""

@@ -2,23 +2,18 @@
 
 # Django
 from django.conf import settings
-from django.core.files.storage import default_storage
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.core.files.uploadedfile import InMemoryUploadedFile
-
-# Selenium
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 
 # Utils
 import jwt
 from datetime import timedelta
 from io import BytesIO
 from PIL import Image
-import os
+import requests
+from bs4 import BeautifulSoup
 
 
 def is_asuka_picture(image=None, user=None, image_url=None):
@@ -44,22 +39,17 @@ def is_asuka_picture(image=None, user=None, image_url=None):
             filename, extra_query_params
         )
 
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("-disable-gpu")
-    options.add_argument("-no-sandbox")
-    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-    service = Service(os.environ.get("CHROMEDRIVER_PATH"))
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0',
+        'Accept': 'text/html'
+    }
+    response = requests.get(search_by_image_url, headers=headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    target = soup.find('input', {'aria-label': 'Search', 'name': 'q'})
 
-    driver = webdriver.Chrome(
-        service=service,
-        options=options
-    )
-
-    driver.get(search_by_image_url)
-    result = driver.find_element('name', 'q').get_attribute('value').upper()
-
+    if target is None:
+        return False
+    result = target.get('value').upper()
     wrong_words = ('WWE', 'LUCHADORA', 'WRESTLER')
     if 'ASUKA' not in result or any([x in result for x in wrong_words]):
         return False

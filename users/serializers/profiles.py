@@ -1,9 +1,8 @@
 """Profile serializers."""
 
 # REST Framework
-from enum import unique
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
+from rest_framework.generics import get_object_or_404
 
 # Models
 from users.models import Profile, User
@@ -40,20 +39,19 @@ class ProfileFollowSerializer(serializers.Serializer):
         default=serializers.CurrentUserDefault()
     )
 
+    def validate_pk(self, value):
+        """Verify the followed user exists."""
+        self.context['followed_user'] = get_object_or_404(
+            User, pk=value, is_verified=True, is_client=True
+        )
+        return value
+
     def validate(self, data):
-        """Verify the followed user exists
-        and it's not the request user.
+        """Verify the followed user
+        is not the request user.
         """
-        try:
-            followed_user = User.objects.get(pk=data['pk'])
-        except User.DoesNotExist:
-            raise serializers.ValidationError("Invalid user.")
-
-        if followed_user == data['request_user']:
+        if self.context['followed_user'] == data['request_user']:
             raise serializers.ValidationError("A user cannot follow itself.")
-
-        self.context['followed_user'] = followed_user
-
         return data
 
     def create(self, data):

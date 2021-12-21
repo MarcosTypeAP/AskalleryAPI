@@ -122,6 +122,8 @@ class UserViewsTestCase(APITestCase):
         follow_url = reverse_lazy('users:users-follow', args=[user_2.pk])
         user_1.is_verified = True
         user_1.save()
+        user_2.is_verified = True
+        user_2.save()
         response = client.post(follow_url)
 
         self.assertEqual(response.status_code, 201)
@@ -197,6 +199,8 @@ class UserViewsTestCase(APITestCase):
 
         client_user.is_verified = True
         client_user.save()
+        user_2.is_verified = True
+        user_2.save()
         response = client.post(follow_url)
 
         self.assertEqual(response.status_code, 201)
