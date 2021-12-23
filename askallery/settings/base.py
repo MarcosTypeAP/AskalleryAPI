@@ -28,14 +28,16 @@ APP_URL = env('APP_URL', default='0.0.0.0')
 HTTP_PROTOCOL = env('HTTP_PROTOCOL', default='https')
 
 ALLOWED_HOSTS = [
-    APP_URL,
-    '127.0.0.1',
-    'localhost',
+    #  APP_URL,
+    #  '127.0.0.1',
+    #  'localhost',
+    '*'
 ]
 
 CORS_ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
+    #  '127.0.0.1',
+    #  'localhost',
+    '*'
 ]
 
 

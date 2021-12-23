@@ -11,11 +11,15 @@ COPY ./requirements /app/requirements
 WORKDIR /app
 
 RUN pip3 install --upgrade pip \
-	&& pip3 install --no-cache-dir -r requirements/dev.txt \
+	&& pip3 install --no-cache-dir -r requirements/production.txt \
 	&& apk del build-deps
 
 COPY . /app/
 
+RUN mkdir /app/media
+
 ENV PYTHONUNBUFFERED 1
+
+RUN chmod +x /app/start
 
 CMD ["/app/start"]

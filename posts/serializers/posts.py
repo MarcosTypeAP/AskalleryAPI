@@ -14,7 +14,7 @@ from posts.models import Post
 from users.serializers import MinimumUserFieldsModelSerializer
 
 # Utils
-from utils.serializers import is_asuka_picture, compress_image
+from utils.serializers import is_asuka_picture, size_reduction
 
 
 class PostModelSerializer(serializers.ModelSerializer):
@@ -45,19 +45,26 @@ class PostCreationModelSerializer(serializers.ModelSerializer):
         model = Post
         fields = ('user', 'caption', 'image')
 
-    def validate(self, data):
+    def validate_image(self, value):
+        """Verifies the image format and that is an asuka picture.."""
+        VALID_IMAGE_EXTENSIONS = ('JPG', 'JPEG', 'PNG')
+        if value.image.format not in VALID_IMAGE_EXTENSIONS:
+            raise serializers.ValidationError(
+                {'image': 'Only jpg, jpeg and png formats are allowed.'}
+            )
         if settings.LOCAL_DEV:
-            return data
-        if is_asuka_picture(image=data['image'], user=data['user']):
-            return data
+            return value
+        image_for_check = size_reduction(value, quality=100)
+        if is_asuka_picture(image=image_for_check):
+            return value
         raise serializers.ValidationError(
             {'image': 'The image must be about ´Asuka Langley´ ' +
              'from ´Neon Genesis Evangelion´.'}
         )
 
     def create(self, data):
-        """Compress the image of the ´image´ field."""
-        data['image'] = compress_image(data['image'])
+        """Compress the image before stororing it."""
+        data['image'] = size_reduction(data['image'])
         return super(PostCreationModelSerializer, self).create(data)
 
 

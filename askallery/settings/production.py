@@ -6,7 +6,8 @@ from .base import env
 LOCAL_DEV = False
 
 ALLOWED_HOSTS = [
-    APP_URL, # NOQA
+    #  APP_URL, # NOQA
+    '*'
 ]
 
 # Email

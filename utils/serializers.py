@@ -5,7 +5,10 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.uploadedfile import (
+    InMemoryUploadedFile, TemporaryUploadedFile
+)
+from django.core.files.temp import NamedTemporaryFile
 
 # Utils
 import jwt
@@ -13,45 +16,60 @@ from datetime import timedelta
 from io import BytesIO
 from PIL import Image
 import requests
+from datetime import datetime
+from sys import getsizeof
 from bs4 import BeautifulSoup
+import time
 
 
-def is_asuka_picture(image=None, user=None, image_url=None):
+def is_asuka_picture(image=None, image_url=None):
     """Validates that the image is a asuka picture."""
 
     google_search_url = 'https://www.google.com/searchbyimage'
-    extra_query_params = '&encoded_image=&image_content=&filename=&hl=en-AR'
+    extra_query_params = '&encoded_image=&image_content=&filename=&hl=en'
 
-    if image_url is not None:
+    if image_url:
         search_by_image_url = '{}?image_url={}{}'.format(
             google_search_url, image_url, extra_query_params
         )
     else:
-        filename = 'tmp-img-{}-{}'.format(user.pk, image.name)
-
-        with open(f'/app/tmp_images/{filename}', 'wb+') as tmp_img:
+        filename = image.name
+        with open(f'{str(settings.MEDIA_ROOT)}/{filename}', 'wb+') as tmp_img:
             for chunck in image.chunks():
                 tmp_img.write(chunck)
 
-        tmp_images_url = '/api/tmpimage/'
+        import os
+        os.system('ls -la /app/media')
+
         search_by_image_url = '{}?image_url=https://{}{}{}{}'.format(
-            google_search_url, settings.APP_URL, tmp_images_url,
-            filename, extra_query_params
+            google_search_url, settings.APP_URL, settings.MEDIA_URL, filename,
+            extra_query_params
         )
 
     headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0',
-        'Accept': 'text/html'
+        'User-Agent':
+            'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0',
+        'Accept':
+            'text/html',
     }
-    response = requests.get(search_by_image_url, headers=headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    target = soup.find('input', {'aria-label': 'Search', 'name': 'q'})
 
-    if target is None:
-        return False
-    result = target.get('value').upper()
-    wrong_words = ('WWE', 'LUCHADORA', 'WRESTLER')
-    if 'ASUKA' not in result or any([x in result for x in wrong_words]):
+    for x in range(3):
+        response = requests.get(search_by_image_url, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        target = soup.find('input', {'aria-label': 'Search', 'name': 'q'})
+        result = target.get('value').upper()
+        if result:
+            break
+        time.sleep(5)
+
+    print(result)
+    WRONG_WORDS = ('WWE', 'LUCHADORA', 'WRESTLER', 'AYANAMI', 'REI')
+    MANDATORY_WORDS = ('ASUKA', 'アスカ')
+
+    check_1 = any([x in result for x in MANDATORY_WORDS])
+    check_2 = any([x in result for x in WRONG_WORDS])
+
+    if not check_1 or check_2:
         return False
     return True
 
@@ -89,17 +107,36 @@ def send_confirmation_email(user):
     msg.send()
 
 
-def compress_image(image):
+def size_reduction(image, quality=70):
     """Compress the given image."""
     img = Image.open(image)
-    img_io = BytesIO()
-    img.save(img_io, 'JPEG', quality=70)
-    return InMemoryUploadedFile(
-        file=img_io,
-        field_name=image.field_name,
-        name=image.name,
-        content_type=image.content_type,
-        size=image.size,
-        charset=image.charset,
-        content_type_extra=image.content_type_extra,
-    )
+    img = img.convert('RGB')
+    img.thumbnail((720, 1280) if img.width < img.height else (1280, 720))
+    filename = '{}.jpeg'.format(int(datetime.now().timestamp()))
+    if isinstance(image, InMemoryUploadedFile):
+        img_io = BytesIO()
+        img.save(img_io, 'JPEG', quality=quality)
+        new_image = InMemoryUploadedFile(
+            file=img_io,
+            field_name=image.field_name,
+            name=filename,
+            content_type='image/jpeg',
+            size=img_io.tell(),
+            charset=None,
+        )
+        new_image.seek(0)
+        image.seek(0)
+        return new_image
+    elif isinstance(image, TemporaryUploadedFile):
+        new_image = TemporaryUploadedFile(
+            name=filename,
+            content_type='image/jpeg',
+            size=0,
+            charset=None
+        )
+        img.save(new_image, 'JPEG', quality=quality)
+        new_image.seek(0)
+        new_image.size = len(new_image.read())
+        new_image.seek(0)
+        image.seek(0)
+        return new_image

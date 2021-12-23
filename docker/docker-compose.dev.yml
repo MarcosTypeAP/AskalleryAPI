@@ -3,11 +3,11 @@ version: "3.7"
 services:
     app:
         build: 
-            context: .
+            context: ..
             dockerfile: ./Dockerfile
         image: askallery-api
         volumes:
-            - .:/app
+            - ..:/app
         ports:
             - "8000:8000"
         environment: 

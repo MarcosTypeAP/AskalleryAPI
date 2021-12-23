@@ -118,17 +118,17 @@ def serve_temporal_image(response, *args, **kwargs):
     image_path = '/app/tmp_images/{}'.format(kwargs.get('image'))
     print('/'*100)
     print(image_path)
-    print(kwargs)
-    print(file_exists(image_path))
-    import pathlib
-    print(pathlib.Path().resolve())
+    print('kwargs:', kwargs)
+    print('file_exists:', file_exists(image_path))
     import os
-    print(os.system('pwd'))
+    print('where:', os.system('pwd'))
     print('/'*100)
     if file_exists(image_path):
         with open(image_path, 'rb') as img:
             response = FileResponse(img)
-        remove_file(image_path)
-        return response
+        #  remove_file(image_path)
+            print('god')
+            return response
     else:
+        print('kuak')
         raise Http404('Image not found')
