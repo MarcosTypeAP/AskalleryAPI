@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # python /app/manage.py collectstatic --noinput
-gunicorn --bind 0.0.0.0:$PORT askallery.wsgi --chdir=/app --graceful-timeout 120 --workers 4
+gunicorn --bind 0.0.0.0:$PORT askallery.wsgi --chdir=/app --graceful-timeout 60 --workers 4

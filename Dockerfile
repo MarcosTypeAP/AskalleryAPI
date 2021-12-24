@@ -17,6 +17,7 @@ RUN pip3 install --upgrade pip \
 COPY . /app/
 
 RUN mkdir /app/media
+RUN mkdir /app/staticfiles
 
 ENV PYTHONUNBUFFERED 1
 

@@ -8,18 +8,18 @@ from django.utils import timezone
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile, TemporaryUploadedFile
 )
-from django.core.files.temp import NamedTemporaryFile
+from django.core.files import temp as tempfile
 
 # Utils
 import jwt
+import time
+import os
+import requests
 from datetime import timedelta
 from io import BytesIO
 from PIL import Image
-import requests
 from datetime import datetime
-from sys import getsizeof
 from bs4 import BeautifulSoup
-import time
 
 
 def is_asuka_picture(image=None, image_url=None):
@@ -107,12 +107,31 @@ def send_confirmation_email(user):
     msg.send()
 
 
-def size_reduction(image, quality=70):
-    """Compress the given image."""
+class CustomTemporaryUploadedFile(TemporaryUploadedFile):
+    """Overrides __init__ to make `delete` false."""
+    def __init__(
+        self, name, content_type, size, charset, content_type_extra=None
+    ):
+        _, ext = os.path.splitext(name)
+        file = tempfile.NamedTemporaryFile(
+            suffix='.upload' + ext,
+            dir=settings.FILE_UPLOAD_TEMP_DIR,
+            delete=False
+        )
+        super(TemporaryUploadedFile, self).__init__(
+            file, name, content_type, size, charset, content_type_extra
+        )
+
+
+def size_reduction(image, quality=70, height=720, width=1280):
+    """Compress and resize the given image."""
     img = Image.open(image)
     img = img.convert('RGB')
-    img.thumbnail((720, 1280) if img.width < img.height else (1280, 720))
+    img.thumbnail(
+        (height, width) if img.width < img.height else (width, height)
+    )
     filename = '{}.jpeg'.format(int(datetime.now().timestamp()))
+
     if isinstance(image, InMemoryUploadedFile):
         img_io = BytesIO()
         img.save(img_io, 'JPEG', quality=quality)
@@ -127,12 +146,10 @@ def size_reduction(image, quality=70):
         new_image.seek(0)
         image.seek(0)
         return new_image
+
     elif isinstance(image, TemporaryUploadedFile):
-        new_image = TemporaryUploadedFile(
-            name=filename,
-            content_type='image/jpeg',
-            size=0,
-            charset=None
+        new_image = CustomTemporaryUploadedFile(
+            name=filename, content_type='image/jpeg', size=0, charset=None
         )
         img.save(new_image, 'JPEG', quality=quality)
         new_image.seek(0)

@@ -28,16 +28,14 @@ APP_URL = env('APP_URL', default='0.0.0.0')
 HTTP_PROTOCOL = env('HTTP_PROTOCOL', default='https')
 
 ALLOWED_HOSTS = [
-    #  APP_URL,
-    #  '127.0.0.1',
-    #  'localhost',
-    '*'
+    APP_URL,
+    '127.0.0.1',
+    'localhost',
 ]
 
 CORS_ALLOWED_HOSTS = [
-    #  '127.0.0.1',
-    #  'localhost',
-    '*'
+    '127.0.0.1',
+    'localhost',
 ]
 
 
@@ -199,7 +197,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Simple JWT
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,

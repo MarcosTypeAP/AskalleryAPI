@@ -7,6 +7,9 @@ from rest_framework.generics import get_object_or_404
 # Models
 from users.models import Profile, User
 
+# Utils
+from utils.serializers import size_reduction
+
 
 class ProfileModelSerializer(serializers.ModelSerializer):
     """Profile model serializer."""
@@ -23,6 +26,23 @@ class ProfileModelSerializer(serializers.ModelSerializer):
             'following_quantity',
             'followers_quantity',
         )
+
+    def validate_picture(self, value):
+        """Verifies the image format and that is an asuka picture.."""
+        VALID_IMAGE_EXTENSIONS = ('JPG', 'JPEG', 'PNG')
+        if value.image.format not in VALID_IMAGE_EXTENSIONS:
+            raise serializers.ValidationError(
+                {'image': 'Only jpg, jpeg and png formats are allowed.'}
+            )
+        return value
+
+    def update(self, instance, data):
+        """Compress and resize `picture`."""
+        data['picture'] = size_reduction(
+            data['picture'], quality=60,
+            width=600, height=600
+        )
+        return super(ProfileModelSerializer, self).update(instance, data)
 
 
 class ProfileFollowSerializer(serializers.Serializer):
