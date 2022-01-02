@@ -39,7 +39,7 @@ class UserViewsTestCase(APITestCase):
 
     def test_signup(self):
         """Test the creation of a new user and
-        if it receives a verification email with a token. 
+        if it receives a verification email with a token.
         """
         c1 = APIClient()
         response = c1.post(self.signup_url, self.signup_data)

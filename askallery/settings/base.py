@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [
 ]
 
 CORS_ALLOWED_HOSTS = [
+    APP_URL,
     '127.0.0.1',
     'localhost',
 ]

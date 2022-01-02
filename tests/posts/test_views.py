@@ -49,8 +49,7 @@ class StaticLiveServerPostViewsTestCase(StaticLiveServerTestCase):
         post = Post.objects.get(user=user_1)
 
         self.assertEqual(post.caption, data_list['caption'])
-        self.assertIn('tmp', post.image.url)
-        self.assertIn('.png', post.image.url)
+        self.assertIn('.jpeg', post.image.url)
 
 
 class PostViewsAPITestCase(APITestCase):

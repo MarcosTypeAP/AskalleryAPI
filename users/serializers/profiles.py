@@ -38,10 +38,11 @@ class ProfileModelSerializer(serializers.ModelSerializer):
 
     def update(self, instance, data):
         """Compress and resize `picture`."""
-        data['picture'] = size_reduction(
-            data['picture'], quality=60,
-            width=600, height=600
-        )
+        if 'picture' in data:
+            data['picture'] = size_reduction(
+                data['picture'], quality=60,
+                width=600, height=600
+            )
         return super(ProfileModelSerializer, self).update(instance, data)
 
 

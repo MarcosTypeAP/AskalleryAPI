@@ -35,11 +35,7 @@ from posts.models import Post
 class UserViewSet(
     mixins.RetrieveModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet
 ):
-    """User view set.
-
-    Handles sign up, login, account verification
-    and profile update.
-    """
+    """User view set."""
 
     filter_backends = [CustomSearchFilter]
 

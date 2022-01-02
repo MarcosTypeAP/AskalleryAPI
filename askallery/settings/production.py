@@ -7,6 +7,13 @@ LOCAL_DEV = False
 
 ALLOWED_HOSTS = [
     APP_URL, # NOQA
+    'localhost'
+]
+
+CORS_ALLOWED_HOSTS = [
+    APP_URL, # NOQA
+    'https://' + APP_URL, # NOQA
+    'localhost'
 ]
 
 # Email
